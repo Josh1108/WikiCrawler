@@ -21,7 +21,7 @@ func add_to_db(key string, value string) {
 		fmt.Println(err)
 	}
 	err = db.Put([]byte(key), []byte(value), nil)
-	fmt.Println(key)
+	// fmt.Println(key)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -38,7 +38,7 @@ func return_url(text string) {
 	iter := db.NewIterator(nil, nil)
 	for iter.Next() {
 		key := string(iter.Key())
-		fmt.Println(key)
+		// fmt.Println(key)
 		value := string(iter.Value())
 		if strings.Contains(value, text) {
 			fmt.Println(key)
@@ -53,21 +53,20 @@ func crawler() {
 	var webpage WebPage
 	c := colly.NewCollector(
 		colly.AllowedDomains("wikipedia.org", "en.wikipedia.org", "https://en.wikipedia.org/"),
-		// colly.MaxDepth(1),
+		colly.MaxDepth(1),
 		colly.Async(true),
 	)
 
-	c.OnHTML("body", func(e *colly.HTMLElement) {
+	c.OnHTML("html", func(e *colly.HTMLElement) {
 
 		webpage.Text = e.ChildText("p")
-		webpage.Url = e.Attr("href")
-		println("here", webpage.Text)
+		webpage.Url = e.Request.URL.String()
 		add_to_db(webpage.Url, webpage.Text)
 	})
 
 	c.OnHTML("a[href]", func(e *colly.HTMLElement) {
-		// link := e.Attr("href")
-		// c.Visit(e.Request.AbsoluteURL(link))
+		link := e.Attr("href")
+		c.Visit(e.Request.AbsoluteURL(link))
 	})
 
 	c.Limit(&colly.LimitRule{
