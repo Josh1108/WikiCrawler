@@ -87,7 +87,7 @@ func crawler() {
 
 func main() {
 
-	crawler()
+	crawler() // comment to stop crawling
 	fmt.Println("==========Crawled pages ==========")
 	fmt.Println("==========links where text is found ==========")
 
